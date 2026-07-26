@@ -184,7 +184,8 @@ footer.site a { color: var(--muted); }
     One API call turns a PDF, DOCX or plain-text resume into the
     <a href="https://jsonresume.org/schema" rel="noopener">JSON Resume</a> schema —
     contact details, work history, education, skills, all typed and dated.
-    The parser is open source. The hosting is $19/month.
+    Deterministic, so the same resume always parses the same way. Nothing is
+    stored, and the parser is MIT licensed if you would rather self-host.
   </p>
   <div class="cta">
     <a class="btn btn-primary" href="#demo">Try it on your resume</a>
@@ -325,15 +326,14 @@ meta.confidence.work      <span class="c">// 0.93</span></div>
   <div class="scroller">
     <table class="cmp">
       <thead>
-        <tr><th>&nbsp;</th><th>CVJSON</th><th>Typical incumbent</th></tr>
+        <tr><th>&nbsp;</th><th>CVJSON</th><th>Most alternatives</th></tr>
       </thead>
       <tbody>
-        <tr><td>Entry price</td><td class="yes">$19/mo</td><td>$75–$800/mo</td></tr>
-        <tr><td>Pricing model</td><td class="yes">Flat, quota stated up front</td><td>Per-parse credits</td></tr>
+        <tr><td>Self-host option</td><td class="yes">Yes, the parser is MIT</td><td>API only</td></tr>
         <tr><td>Output format</td><td class="yes">JSON Resume (open standard)</td><td>Proprietary schema</td></tr>
-        <tr><td>Self-host option</td><td class="yes">Yes, MIT licensed</td><td>No</td></tr>
         <tr><td>Stores your resumes</td><td class="yes">No</td><td>Usually yes</td></tr>
-        <tr><td>Sales call to start</td><td class="yes">No</td><td>Often required</td></tr>
+        <tr><td>Cost per parse</td><td class="yes">Zero — no model inference</td><td>Metered credits</td></tr>
+        <tr><td>Determinism</td><td class="yes">Same input, same output</td><td>Varies with the model</td></tr>
       </tbody>
     </table>
   </div>

@@ -31,19 +31,26 @@ meta.confidence.work       // 0.93
 
 ## Why this exists
 
-Resume parsing is a solved problem that stays expensive. The established
-vendors start around $75/month and run past $800, bill per parse, return a
-proprietary schema, and generally want a sales call before you can try anything.
+Resume parsing is a crowded market. The enterprise vendors (Affinda,
+Textkernel, Daxtra) run from $75 to $800+ a month and usually want a sales
+call. A budget tier already exists too — CVParserPro from $29/month,
+Superparser, and several free tiers — so "cheaper than the incumbents" is not,
+on its own, a reason to pick this.
 
-CVJSON takes the opposite position on all four:
+What is actually different about CVJSON:
 
-|                      | CVJSON                        | Typical incumbent      |
+|                      | CVJSON                        | Most alternatives      |
 | -------------------- | ----------------------------- | ---------------------- |
-| Entry price          | $19/month                     | $75–$800/month         |
-| Pricing model        | Flat, quota stated up front   | Per-parse credits      |
+| Self-host option     | Yes, the parser is MIT        | No — API only          |
 | Output format        | JSON Resume (open standard)   | Proprietary schema     |
-| Self-host option     | Yes, MIT licensed             | No                     |
 | Stores your resumes  | No                            | Usually yes            |
+| Cost per parse       | Zero — no model inference     | Metered credits        |
+| Determinism          | Same input, same output       | Varies with the model  |
+
+If you want the most accurate parser available and do not care where the data
+goes, one of the LLM-backed services will likely beat this on messy documents.
+CVJSON is for the case where you need the parsing to be reproducible, free at
+the margin, and runnable inside your own infrastructure.
 
 ## What it does well, and what it does not
 
