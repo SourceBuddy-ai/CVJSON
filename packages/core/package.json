@@ -1,0 +1,61 @@
+{
+  "name": "cvjson",
+  "version": "0.1.0",
+  "description": "Parse resumes and CVs (PDF, DOCX, TXT, HTML) into the JSON Resume schema. Fast, dependency-light, and runs anywhere JavaScript does — Node, Deno, Bun, browsers and edge runtimes.",
+  "keywords": [
+    "resume",
+    "cv",
+    "resume-parser",
+    "cv-parser",
+    "json-resume",
+    "ats",
+    "recruiting",
+    "hr",
+    "pdf",
+    "docx",
+    "parser"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "bench": "node --experimental-strip-types scripts/benchmark.ts"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2"
+  },
+  "peerDependencies": {
+    "unpdf": "^0.12.0"
+  },
+  "peerDependenciesMeta": {
+    "unpdf": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^5.6.0",
+    "unpdf": "^0.12.0",
+    "vitest": "^2.1.0"
+  }
+}

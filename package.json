@@ -1,0 +1,20 @@
+{
+  "name": "cvjson-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "CVJSON — resume parsing as an open-source library and a hosted API.",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=cvjson",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "dev:api": "npm run dev --workspace=@cvjson/api",
+    "deploy:api": "npm run deploy --workspace=@cvjson/api"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

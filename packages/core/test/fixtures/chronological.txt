@@ -1,0 +1,42 @@
+Jane A. Rodriguez
+Senior Software Engineer
+San Francisco, CA | jane.rodriguez@example.com | (415) 555-0182
+linkedin.com/in/janerodriguez | github.com/jrodriguez | janerodriguez.dev
+
+PROFESSIONAL SUMMARY
+Backend engineer with 9 years building distributed systems at scale. Led the
+migration of a monolith serving 40M requests/day to event-driven microservices.
+
+WORK EXPERIENCE
+
+Stripe | Staff Software Engineer | Jan 2021 - Present
+San Francisco, CA
+• Designed the idempotency layer now handling 2.1B API calls per month
+• Cut p99 latency on the payments path from 840ms to 190ms
+• Mentored 6 engineers; 3 promoted to senior within 18 months
+
+Airbnb | Senior Software Engineer | Mar 2018 - Dec 2020
+• Built the pricing experimentation platform used by 200+ engineers
+• Reduced infrastructure spend by $1.4M annually through query optimization
+
+Datadog | Software Engineer | Jun 2016 - Feb 2018
+• Shipped the first version of the distributed tracing ingest pipeline
+
+EDUCATION
+
+Carnegie Mellon University | M.S. in Computer Science | 2014 - 2016
+GPA: 3.9/4.0
+
+University of Texas at Austin | B.S. in Computer Engineering | 2010 - 2014
+
+TECHNICAL SKILLS
+Languages: Go, Python, TypeScript, Rust, SQL
+Infrastructure: Kubernetes, Terraform, AWS, Docker, Kafka
+Databases: PostgreSQL, Redis, Cassandra, ClickHouse
+
+CERTIFICATIONS
+AWS Certified Solutions Architect - Professional | Amazon Web Services | 2022
+Certified Kubernetes Administrator | CNCF | 2021
+
+LANGUAGES
+English (Native), Spanish (Fluent), Portuguese (Conversational)

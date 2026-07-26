@@ -1,0 +1,47 @@
+MARCUS OKONKWO
+marcus.okonkwo@example.co.uk
++44 20 7946 0958
+London, United Kingdom
+
+PROFILE
+
+Product manager turned engineering leader. Twelve years shipping consumer
+software, most recently as Director of Engineering for a 40-person org.
+
+EMPLOYMENT HISTORY
+
+Monzo Bank Ltd
+Director of Engineering
+September 2020 — Present
+   Rebuilt the onboarding funnel, lifting activation from 54% to 71%
+   Grew the platform team from 9 to 34 engineers across three squads
+   Introduced an on-call rotation that cut mean time to recovery by 62%
+
+Deliveroo
+Head of Product, Consumer
+2017 - 2020
+   Owned the consumer app roadmap through Series G
+   Launched Deliveroo Plus, reaching 1M subscribers in 14 months
+
+Skyscanner
+Senior Product Manager
+2014 - 2017
+   Led the mobile booking experience across iOS and Android
+
+EDUCATION
+
+Imperial College London
+MEng Computing
+2010 - 2014
+First Class Honours
+
+ACADEMIC AWARDS
+Dean's List | Imperial College London | 2013
+Best Final Year Project | Department of Computing | 2014
+
+CORE COMPETENCIES
+Product Strategy, Team Leadership, Agile, Scrum, Stakeholder Management,
+Roadmapping, A/B Testing, SQL, Python
+
+INTERESTS
+Long-distance running, chess, open-source contribution

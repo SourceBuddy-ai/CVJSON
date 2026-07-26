@@ -1,0 +1,34 @@
+name = "cvjson-api"
+main = "src/index.ts"
+compatibility_date = "2026-01-15"
+
+# unpdf's serverless PDF.js build reaches for a few Node built-ins.
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[vars]
+SITE_URL = "https://cvjson.dev"
+MAX_UPLOAD_BYTES = "5242880"
+
+# Created with:  npx wrangler d1 create cvjson
+# Paste the returned database_id here, then apply the schema:
+#   npx wrangler d1 execute cvjson --remote --file=./schema.sql
+[[d1_databases]]
+binding = "DB"
+database_name = "cvjson"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# Hourly cleanup of expired rate-limit rows.
+[triggers]
+crons = ["17 * * * *"]
+
+# Secrets are set with `wrangler secret put <NAME>`, never committed:
+#   STRIPE_SECRET_KEY
+#   STRIPE_WEBHOOK_SECRET
+#   STRIPE_PRICE_STARTER
+#   STRIPE_PRICE_GROWTH
+#   STRIPE_PRICE_SCALE
+#   RESEND_API_KEY
+#   EMAIL_FROM

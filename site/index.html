@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CVJSON — Resume parsing API that returns JSON Resume</title>
+<meta name="description" content="Turn any resume (PDF, DOCX, TXT) into structured JSON Resume in one API call. Open-source parser core, hosted API from $19/month. No per-parse surprises.">
+<link rel="canonical" href="https://cvjson.dev/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="CVJSON — Resume parsing API that returns JSON Resume">
+<meta property="og:description" content="Turn any resume into structured JSON in one API call. Open-source core, hosted API from $19/month.">
+<meta property="og:url" content="https://cvjson.dev/">
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #fff; --line: #e6e4e0; --ink: #16150f;
+  --muted: #6b6862; --accent: #b4522a; --accent-soft: #fdf3ee;
+  --code-bg: #16150f; --code-ink: #e9e6df; --ok: #2f6f4f;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14130f; --surface: #1c1b16; --line: #302e27; --ink: #f0ede6;
+    --muted: #a29d94; --accent: #e08056; --accent-soft: #2a1f18;
+    --code-bg: #0d0c0a; --code-ink: #e9e6df; --ok: #7fbf9a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14130f; --surface: #1c1b16; --line: #302e27; --ink: #f0ede6;
+  --muted: #a29d94; --accent: #e08056; --accent-soft: #2a1f18;
+  --code-bg: #0d0c0a; --code-ink: #e9e6df; --ok: #7fbf9a;
+}
+:root[data-theme="light"] {
+  --bg: #fbfbfa; --surface: #fff; --line: #e6e4e0; --ink: #16150f;
+  --muted: #6b6862; --accent: #b4522a; --accent-soft: #fdf3ee;
+  --code-bg: #16150f; --code-ink: #e9e6df; --ok: #2f6f4f;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--sans); font-size: 17px; line-height: 1.65;
+  overflow-x: hidden;
+}
+.wrap { width: min(100% - 2.5rem, 68rem); margin-inline: auto; }
+a { color: var(--accent); }
+
+header.site {
+  border-bottom: 1px solid var(--line); position: sticky; top: 0;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px); z-index: 20;
+}
+header.site .wrap {
+  display: flex; align-items: center; gap: 1.5rem;
+  padding-block: .9rem; flex-wrap: wrap;
+}
+.brand { font-weight: 700; letter-spacing: -.02em; font-size: 1.15rem; text-decoration: none; color: var(--ink); }
+.brand span { color: var(--accent); }
+header.site nav { margin-left: auto; display: flex; gap: 1.4rem; font-size: .95rem; }
+header.site nav a { color: var(--muted); text-decoration: none; }
+header.site nav a:hover { color: var(--ink); }
+
+.hero { padding-block: clamp(3.5rem, 9vw, 6.5rem) 2.5rem; }
+h1 {
+  font-size: clamp(2.1rem, 5.5vw, 3.6rem); line-height: 1.08;
+  letter-spacing: -.035em; margin: 0 0 1.1rem; max-width: 20ch;
+}
+.lede { font-size: clamp(1.05rem, 2.2vw, 1.3rem); color: var(--muted); max-width: 58ch; margin: 0 0 2rem; }
+
+.cta { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
+.btn {
+  display: inline-block; padding: .7rem 1.3rem; border-radius: .5rem;
+  font-weight: 600; font-size: .97rem; text-decoration: none; cursor: pointer;
+  border: 1px solid transparent; font-family: inherit;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { border-color: var(--line); color: var(--ink); background: var(--surface); }
+.btn-ghost:hover { border-color: var(--muted); }
+
+.trust { margin-top: 1.4rem; font-size: .9rem; color: var(--muted); }
+.trust code { font-family: var(--mono); font-size: .87em; }
+
+section { padding-block: 3rem; }
+h2 { font-size: clamp(1.5rem, 3.2vw, 2rem); letter-spacing: -.025em; margin: 0 0 .6rem; }
+h3 { font-size: 1.05rem; margin: 0 0 .35rem; letter-spacing: -.01em; }
+.section-lede { color: var(--muted); max-width: 60ch; margin: 0 0 2rem; }
+
+/* Demo ------------------------------------------------------------------ */
+.demo { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: stretch; }
+@media (max-width: 860px) { .demo { grid-template-columns: 1fr; } }
+.panel {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: .7rem; overflow: hidden; display: flex; flex-direction: column;
+}
+.panel-head {
+  padding: .6rem .9rem; border-bottom: 1px solid var(--line);
+  font-size: .8rem; font-weight: 600; color: var(--muted);
+  letter-spacing: .06em; text-transform: uppercase;
+  display: flex; align-items: center; gap: .6rem;
+}
+textarea {
+  border: 0; resize: vertical; min-height: 20rem; padding: .9rem;
+  font-family: var(--mono); font-size: .8rem; line-height: 1.55;
+  background: transparent; color: var(--ink); width: 100%; flex: 1;
+}
+textarea:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
+pre.out {
+  margin: 0; padding: .9rem; background: var(--code-bg); color: var(--code-ink);
+  font-family: var(--mono); font-size: .78rem; line-height: 1.55;
+  overflow: auto; flex: 1; min-height: 20rem; max-height: 34rem;
+}
+.demo-actions { display: flex; gap: .6rem; align-items: center; margin-top: 1rem; flex-wrap: wrap; }
+.demo-note { font-size: .87rem; color: var(--muted); }
+.spinner { display: none; font-size: .87rem; color: var(--muted); }
+.spinner.on { display: inline; }
+
+/* Features -------------------------------------------------------------- */
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.5rem 2rem; }
+.feat p { margin: 0; color: var(--muted); font-size: .95rem; }
+
+/* Pricing --------------------------------------------------------------- */
+.tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.1rem; }
+.tier {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: .7rem; padding: 1.4rem; display: flex; flex-direction: column;
+}
+.tier.featured { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.tier h3 { font-size: .82rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.price { font-size: 2.1rem; font-weight: 700; letter-spacing: -.03em; margin: .2rem 0 .1rem; }
+.price small { font-size: .95rem; font-weight: 400; color: var(--muted); }
+.tier ul { list-style: none; padding: 0; margin: 1rem 0 1.4rem; font-size: .93rem; color: var(--muted); }
+.tier li { padding-left: 1.3rem; position: relative; margin-bottom: .4rem; }
+.tier li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+.tier .btn { margin-top: auto; text-align: center; }
+
+/* Code ------------------------------------------------------------------ */
+.codeblock {
+  background: var(--code-bg); color: var(--code-ink); border-radius: .6rem;
+  padding: 1rem 1.1rem; overflow-x: auto; font-family: var(--mono);
+  font-size: .84rem; line-height: 1.6;
+}
+.codeblock .c { color: #8c877c; }
+.codeblock .s { color: #d8a657; }
+.codeblock .k { color: #e08056; }
+
+table.cmp { width: 100%; border-collapse: collapse; font-size: .93rem; }
+.scroller { overflow-x: auto; }
+table.cmp th, table.cmp td { padding: .65rem .8rem; text-align: left; border-bottom: 1px solid var(--line); }
+table.cmp th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+table.cmp td.yes { color: var(--ok); font-weight: 600; }
+
+details { border-bottom: 1px solid var(--line); padding: .9rem 0; }
+summary { cursor: pointer; font-weight: 600; }
+details p { color: var(--muted); margin: .6rem 0 0; max-width: 65ch; }
+
+footer.site { border-top: 1px solid var(--line); padding-block: 2rem; color: var(--muted); font-size: .9rem; margin-top: 2rem; }
+footer.site .wrap { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+footer.site a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="/">CV<span>JSON</span></a>
+    <nav>
+      <a href="#demo">Demo</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/docs">Docs</a>
+      <a href="https://github.com/SourceBuddy-ai/cvjson">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero wrap">
+  <h1>Every resume, as structured JSON.</h1>
+  <p class="lede">
+    One API call turns a PDF, DOCX or plain-text resume into the
+    <a href="https://jsonresume.org/schema" rel="noopener">JSON Resume</a> schema —
+    contact details, work history, education, skills, all typed and dated.
+    The parser is open source. The hosting is $19/month.
+  </p>
+  <div class="cta">
+    <a class="btn btn-primary" href="#demo">Try it on your resume</a>
+    <a class="btn btn-ghost" href="#pricing">See pricing</a>
+  </div>
+  <p class="trust">
+    No signup for the demo · <code>npm install cvjson</code> to self-host · MIT licensed core
+  </p>
+</section>
+
+<section class="wrap" id="demo">
+  <h2>Paste a resume, get JSON</h2>
+  <p class="section-lede">
+    This runs the real parser through the live API. Nothing you paste is stored —
+    the text is parsed in memory and the response is thrown away.
+  </p>
+
+  <div class="demo">
+    <div class="panel">
+      <div class="panel-head">Resume text</div>
+      <textarea id="input" spellcheck="false" aria-label="Resume text to parse"></textarea>
+    </div>
+    <div class="panel">
+      <div class="panel-head">JSON Resume output</div>
+      <pre class="out" id="output" aria-live="polite">Press “Parse resume”.</pre>
+    </div>
+  </div>
+
+  <div class="demo-actions">
+    <button class="btn btn-primary" id="run" type="button">Parse resume</button>
+    <button class="btn btn-ghost" id="reset" type="button">Reset example</button>
+    <span class="spinner" id="spinner">Parsing…</span>
+    <span class="demo-note">10 free parses per day, per IP.</span>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>What you get</h2>
+  <div class="grid3">
+    <div class="feat">
+      <h3>A real schema, not a blob</h3>
+      <p>Output validates against the JSON Resume spec, so it drops straight into
+      the existing ecosystem of themes, validators and importers.</p>
+    </div>
+    <div class="feat">
+      <h3>Dates you can sort on</h3>
+      <p>“Jan 2020”, “01/2020” and “2020-01” all normalise to ISO 8601 — at the
+      precision the resume actually stated, never invented.</p>
+    </div>
+    <div class="feat">
+      <h3>Confidence per field</h3>
+      <p>Every parse reports how sure it is about each field, so you can route
+      the shaky ones to a human instead of trusting everything equally.</p>
+    </div>
+    <div class="feat">
+      <h3>Nothing is stored</h3>
+      <p>Resumes are parsed in memory and never written to disk. There is no
+      candidate database to breach, audit, or file a DSAR against.</p>
+    </div>
+    <div class="feat">
+      <h3>Predictable pricing</h3>
+      <p>A flat monthly plan with a stated quota. No per-parse metering that
+      quietly triples your invoice in a hiring push.</p>
+    </div>
+    <div class="feat">
+      <h3>No lock-in</h3>
+      <p>The parser is MIT licensed on npm. If the hosted API ever stops suiting
+      you, run the same code yourself.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>Two lines to integrate</h2>
+  <div class="codeblock"><span class="c"># Hosted API — send the file, get JSON back</span>
+curl -X POST https://api.cvjson.dev/v1/parse \
+  -H <span class="s">"Authorization: Bearer cvj_live_…"</span> \
+  -F <span class="s">"file=@resume.pdf"</span>
+
+<span class="c"># Or run the same parser yourself</span>
+npm install cvjson</div>
+
+  <div class="codeblock" style="margin-top:1rem"><span class="k">import</span> { parseResume } <span class="k">from</span> <span class="s">'cvjson'</span>;
+
+<span class="k">const</span> { resume, meta } = <span class="k">await</span> parseResume(pdfBuffer);
+
+resume.basics.name        <span class="c">// "Jane Rodriguez"</span>
+resume.work[<span class="s">0</span>].startDate  <span class="c">// "2021-01"</span>
+meta.confidence.work      <span class="c">// 0.93</span></div>
+</section>
+
+<section class="wrap" id="pricing">
+  <h2>Pricing</h2>
+  <p class="section-lede">
+    Every plan includes the full parser — the only difference is volume.
+    Cancel any time from the billing portal.
+  </p>
+
+  <div class="tiers">
+    <div class="tier">
+      <h3>Starter</h3>
+      <div class="price">$19<small>/mo</small></div>
+      <ul>
+        <li>1,000 parses per month</li>
+        <li>60 requests / minute</li>
+        <li>PDF, DOCX, HTML, text</li>
+        <li>Email support</li>
+      </ul>
+      <a class="btn btn-ghost" data-plan="starter" href="#">Subscribe</a>
+    </div>
+
+    <div class="tier featured">
+      <h3>Growth</h3>
+      <div class="price">$49<small>/mo</small></div>
+      <ul>
+        <li>5,000 parses per month</li>
+        <li>120 requests / minute</li>
+        <li>PDF, DOCX, HTML, text</li>
+        <li>Email support</li>
+      </ul>
+      <a class="btn btn-primary" data-plan="growth" href="#">Subscribe</a>
+    </div>
+
+    <div class="tier">
+      <h3>Scale</h3>
+      <div class="price">$149<small>/mo</small></div>
+      <ul>
+        <li>25,000 parses per month</li>
+        <li>300 requests / minute</li>
+        <li>PDF, DOCX, HTML, text</li>
+        <li>Priority support</li>
+      </ul>
+      <a class="btn btn-ghost" data-plan="scale" href="#">Subscribe</a>
+    </div>
+  </div>
+
+  <h2 style="margin-top:3rem">How that compares</h2>
+  <div class="scroller">
+    <table class="cmp">
+      <thead>
+        <tr><th>&nbsp;</th><th>CVJSON</th><th>Typical incumbent</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Entry price</td><td class="yes">$19/mo</td><td>$75–$800/mo</td></tr>
+        <tr><td>Pricing model</td><td class="yes">Flat, quota stated up front</td><td>Per-parse credits</td></tr>
+        <tr><td>Output format</td><td class="yes">JSON Resume (open standard)</td><td>Proprietary schema</td></tr>
+        <tr><td>Self-host option</td><td class="yes">Yes, MIT licensed</td><td>No</td></tr>
+        <tr><td>Stores your resumes</td><td class="yes">No</td><td>Usually yes</td></tr>
+        <tr><td>Sales call to start</td><td class="yes">No</td><td>Often required</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>Questions</h2>
+
+  <details>
+    <summary>How accurate is it?</summary>
+    <p>On conventionally formatted resumes it reliably recovers contact details,
+    employers, titles, dates, degrees and skills. It is a deterministic parser,
+    not a language model: it does not hallucinate a job that is not on the page,
+    and it will not rescue a resume laid out as a two-column graphic-design
+    piece. Every field carries a confidence score so you can see which ones to
+    check. Try the demo on your own hardest examples before subscribing.</p>
+  </details>
+
+  <details>
+    <summary>What about scanned PDFs?</summary>
+    <p>A scan is an image, so there is no text to extract. The API returns a
+    warning telling you the document needs OCR first. Run it through an OCR tool
+    and send the result as text.</p>
+  </details>
+
+  <details>
+    <summary>Do you keep the resumes I send?</summary>
+    <p>No. Documents are parsed in memory and the response is returned; nothing
+    is written to storage or logs. The only things stored are your hashed API
+    key and a monthly request count.</p>
+  </details>
+
+  <details>
+    <summary>What happens if I exceed my quota?</summary>
+    <p>The API returns <code>402</code> with a clear message and no charge. You
+    can upgrade instantly from the billing portal, or wait for the next monthly
+    period. There is no surprise overage billing.</p>
+  </details>
+
+  <details>
+    <summary>If the core is MIT, why pay?</summary>
+    <p>You are paying for the hosting, not the algorithm — a maintained endpoint,
+    PDF and DOCX extraction that works in any runtime, and updates as resume
+    formats drift. If you would rather run it yourself, that is a supported and
+    encouraged path.</p>
+  </details>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>© 2026 CVJSON</span>
+    <a href="/docs">Docs</a>
+    <a href="https://github.com/SourceBuddy-ai/cvjson">GitHub</a>
+    <a href="https://www.npmjs.com/package/cvjson">npm</a>
+    <a href="/privacy">Privacy</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // Point the demo at the API. Same-origin in production behind a route; the
+  // fallback covers previewing this page from a file or a different host.
+  var API = (location.hostname === 'localhost' || location.protocol === 'file:')
+    ? 'http://127.0.0.1:8787'
+    : 'https://api.cvjson.dev';
+
+  var EXAMPLE = [
+    'Jane A. Rodriguez',
+    'Senior Software Engineer',
+    'San Francisco, CA | jane.rodriguez@example.com | (415) 555-0182',
+    'linkedin.com/in/janerodriguez | github.com/jrodriguez',
+    '',
+    'PROFESSIONAL SUMMARY',
+    'Backend engineer with 9 years building distributed systems at scale.',
+    '',
+    'WORK EXPERIENCE',
+    '',
+    'Stripe | Staff Software Engineer | Jan 2021 - Present',
+    'San Francisco, CA',
+    '• Designed the idempotency layer handling 2.1B API calls per month',
+    '• Cut p99 latency on the payments path from 840ms to 190ms',
+    '',
+    'Airbnb | Senior Software Engineer | Mar 2018 - Dec 2020',
+    '• Built the pricing experimentation platform used by 200+ engineers',
+    '',
+    'EDUCATION',
+    '',
+    'Carnegie Mellon University | M.S. in Computer Science | 2014 - 2016',
+    'GPA: 3.9/4.0',
+    '',
+    'TECHNICAL SKILLS',
+    'Languages: Go, Python, TypeScript, Rust',
+    'Infrastructure: Kubernetes, Terraform, AWS, Docker',
+    '',
+    'LANGUAGES',
+    'English (Native), Spanish (Fluent)'
+  ].join('\n');
+
+  var input = document.getElementById('input');
+  var output = document.getElementById('output');
+  var runBtn = document.getElementById('run');
+  var resetBtn = document.getElementById('reset');
+  var spinner = document.getElementById('spinner');
+
+  input.value = EXAMPLE;
+
+  function show(text) { output.textContent = text; }
+
+  async function run() {
+    var text = input.value.trim();
+    if (!text) { show('Paste a resume first.'); return; }
+
+    runBtn.disabled = true;
+    spinner.classList.add('on');
+    show('Parsing…');
+
+    try {
+      var response = await fetch(API + '/v1/demo/parse', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text: text })
+      });
+
+      var payload = await response.json();
+
+      if (!response.ok) {
+        var message = (payload && payload.error && payload.error.message)
+          ? payload.error.message
+          : 'Request failed (' + response.status + ').';
+        show(message);
+        return;
+      }
+
+      show(JSON.stringify(payload.resume, null, 2));
+    } catch (err) {
+      show('Could not reach the API. Check your connection and try again.');
+    } finally {
+      runBtn.disabled = false;
+      spinner.classList.remove('on');
+    }
+  }
+
+  runBtn.addEventListener('click', run);
+  resetBtn.addEventListener('click', function () {
+    input.value = EXAMPLE;
+    show('Press “Parse resume”.');
+  });
+
+  // Stripe Payment Links are pasted in at launch; until then the buttons say so
+  // rather than silently doing nothing.
+  var LINKS = {
+    starter: '',
+    growth: '',
+    scale: ''
+  };
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-plan]'), function (el) {
+    var url = LINKS[el.getAttribute('data-plan')];
+    if (url) {
+      el.setAttribute('href', url);
+      return;
+    }
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      alert('Checkout is not configured yet. Add your Stripe Payment Links in site/index.html.');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
